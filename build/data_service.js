@@ -2,6 +2,27 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var app = express();
+// user
+var User = (function () {
+    function User(id, userName, fullName, password, group, desc) {
+        this.id = id;
+        this.userName = userName;
+        this.fullName = fullName;
+        this.password = password;
+        this.group = group;
+        this.desc = desc;
+    }
+    return User;
+}());
+exports.User = User;
+var users = [
+    new User('001', 'user_name_001', 'full_name_001', 'pass', '0', 'desc_001'),
+    new User('002', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
+    new User('003', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
+    new User('004', 'user_name_004', 'full_name_004', 'pass', '1', 'desc_004'),
+    new User('005', 'user_name_005', 'full_name_005', 'pass', '1', 'desc_005')
+];
+// product
 var Product = (function () {
     function Product(id, title, price, rating, desc, categories) {
         this.id = id;
@@ -14,6 +35,9 @@ var Product = (function () {
     return Product;
 }());
 exports.Product = Product;
+app.get('/users', function (req, res) {
+    res.json(users);
+});
 var products = [
     new Product(1, '第一个商品', 1.99, 3.5, '这是第一个商品', ['电子产品']),
     new Product(2, '第二个商品', 2.99, 2.5, '这是第二个商品', ['电子产品', '硬件设备']),
