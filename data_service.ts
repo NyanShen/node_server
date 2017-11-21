@@ -1,6 +1,20 @@
 import * as express from 'express';
 
 const app = express();
+
+app.all('*', function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By", ' 3.2.1');
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+});
+
+const server = app.listen(8088, "localhost", () => {
+    console.log("服务器已启动，地址是：http://localhost:8088");
+});
+
 // user
 export class User {
     constructor(public id: string,
@@ -19,6 +33,11 @@ const users: User[] = [
     new User('005', 'user_name_005', 'full_name_005', 'pass', '1', 'desc_005')
 ];
 
+app.get('/users', (req, res) => {
+    res.json({users: users});
+});
+
+
 // product
 export class Product {
     constructor(public id: number,
@@ -29,9 +48,6 @@ export class Product {
                 public categories: Array<string>) {
     }
 }
-app.get('/users', (req, res) => {
-    res.json(users);
-});
 
 const products: Product[] = [
     new Product(1, '第一个商品', 1.99, 3.5, '这是第一个商品', ['电子产品']),
@@ -42,18 +58,17 @@ const products: Product[] = [
     new Product(6, '第五个商品', 6.99, 2.5, '这是第六个商', ['电子产品'])
 ];
 
-app.get('/', (req, res) => {
-    res.send("Hello Express");
-});
-
 app.get('/products', (req, res) => {
-    res.json(products);
+    res.status(200);
+    res.json({products: products});
 });
 
 app.get('/products/:id', (req, res) => {
-    res.json(products.find((product) => product.id == req.params.id));
+    res.status(200);
+    res.json({product: products.find((product) => product.id == req.params.id)});
 });
 
-const server = app.listen(8080, "localhost", () => {
-    console.log("服务器已启动，地址是：http://localhost:8080");
+
+app.get('/', (req, res) => {
+    res.send("Hello Express");
 });
