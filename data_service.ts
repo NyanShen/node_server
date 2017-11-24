@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as _ from 'lodash';
 
 const app = express();
 
@@ -29,14 +30,110 @@ const users: User[] = [
     new User('001', 'user_name_001', 'full_name_001', 'pass', '0', 'desc_001'),
     new User('002', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
     new User('003', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
-    new User('004', 'user_name_004', 'full_name_004', 'pass', '1', 'desc_004'),
-    new User('005', 'user_name_005', 'full_name_005', 'pass', '1', 'desc_005')
+    new User('004', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
+    new User('005', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
 ];
 
 app.get('/users', (req, res) => {
-    res.json({users: users});
+    if (_.isEmpty(req.query.userName)&&_.isEmpty(req.query.fullName)) {
+        res.json({users: users});
+    } else {
+        res.json({
+            users: users.filter(
+                (user) =>
+                ((user.userName).indexOf(req.query.userName)) > 0 ||
+                ((user.fullName).indexOf(req.query.fullName)) > 0
+            )
+        });
+    }
 });
 
+//menu
+const menus = [
+    {
+        "id": "0010",
+        "fatherId": "0000",
+        "name": "sell",
+        "path": "/auction/sell",
+        "childItems": [
+            {
+                "id": "0011",
+                "fatherId": "0010",
+                "name": "竞拍商品",
+                "path": "/auction/sell/product-list",
+                "childItems": []
+            },
+            {
+                "id": "0012",
+                "fatherId": "0010",
+                "name": "成交商品",
+                "path": "/auction/sell/product-success",
+                "childItems": []
+            },
+            {
+                "id": "0013",
+                "fatherId": "0010",
+                "name": "新增商品",
+                "path": "/auction/sell/product-add",
+                "childItems": []
+            },
+            {
+                "id": "0014",
+                "fatherId": "0010",
+                "name": "最新商品",
+                "path": "/auction/sell/product-latest",
+                "childItems": []
+            }
+        ]
+    },
+    {
+        "id": "0020",
+        "fatherId": "0000",
+        "name": "backstage",
+        "path": "/auction/backstage",
+        "childItems": [
+            {
+                "id": "0021",
+                "fatherId": "0020",
+                "name": "用户管理",
+                "path": "/auction/backstage/user-manage",
+                "childItems": []
+            },
+            {
+                "id": "0022",
+                "fatherId": "0020",
+                "name": "角色管理",
+                "path": "/auction/backstage/role-manage",
+                "childItems": []
+            },
+            {
+                "id": "0023",
+                "fatherId": "0020",
+                "name": "页面管理",
+                "path": "/auction/backstage/page-manage",
+                "childItems": []
+            },
+            {
+                "id": "0024",
+                "fatherId": "0010",
+                "name": "用户角色",
+                "path": "/auction/backstage/user-role",
+                "childItems": []
+            },
+            {
+                "id": "0025",
+                "fatherId": "0010",
+                "name": "模块管理",
+                "path": "/auction/backstage/module-manage",
+                "childItems": []
+            }
+        ]
+    }
+];
+
+app.get('/menus', (req, res) => {
+    res.json({menus: menus});
+});
 
 // product
 export class Product {
