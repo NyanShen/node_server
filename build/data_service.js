@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 // app.use(bodyParser.urlencoded({extended: false}));
 // app.use(bodyParser.json());
 var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({extended: false})
+var urlencodedParser = bodyParser.urlencoded({extended: false});
 
 app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -42,6 +42,10 @@ var users = [
     new User('004', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
     new User('005', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
 ];
+app.get('/users/:id', function (req, res) {
+    res.status(200);
+    res.json(users.find(function (user) {return user.id === req.params.id;}));
+});
 app.get('/users', function (req, res) {
     if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
         res.json({users: users});
@@ -60,7 +64,6 @@ app.post('/users', jsonParser, urlencodedParser, function (req, res) {
     users.push(user);
     res.send('save success');
 });
-
 app.delete('/users/:id', function (req, res) {
     const deleteUser = users.findIndex(function (user) {
         return user.id === req.params.id;
