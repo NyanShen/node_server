@@ -61,6 +61,14 @@ app.post('/users', jsonParser, urlencodedParser, function (req, res) {
     res.send('save success');
 });
 
+app.delete('/users/:id', function (req, res) {
+    const deleteUser = users.findIndex(function (user) {
+        return user.id === req.params.id;
+    });
+    users.splice(deleteUser, 1);
+    res.send('delete success');
+});
+
 //menu
 var menus = [
     {
@@ -176,7 +184,7 @@ app.get('/products/:id', function (req, res) {
     res.status(200);
     res.json({
         product: products.find(function (product) {
-            return product.id == req.params.id;
+            return product.id === req.params.id;
         })
     });
 });
