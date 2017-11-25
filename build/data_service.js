@@ -1,8 +1,15 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {value: true});
 var express = require("express");
 var _ = require("lodash");
 var app = express();
+var bodyParser = require('body-parser');
+// url 统一资源调配符 encoded 编码
+// app.use(bodyParser.urlencoded({extended: false}));
+// app.use(bodyParser.json());
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({extended: false})
+
 app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -24,6 +31,7 @@ var User = (function () {
         this.group = group;
         this.desc = desc;
     }
+
     return User;
 }());
 exports.User = User;
@@ -36,7 +44,7 @@ var users = [
 ];
 app.get('/users', function (req, res) {
     if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
-        res.json({ users: users });
+        res.json({users: users});
     }
     else {
         res.json({
@@ -47,6 +55,12 @@ app.get('/users', function (req, res) {
         });
     }
 });
+app.post('/users', jsonParser, urlencodedParser, function (req, res) {
+    var user = req.body.user;
+    users.push(user);
+    res.send('save success');
+});
+
 //menu
 var menus = [
     {
@@ -101,15 +115,15 @@ var menus = [
             {
                 "id": "0022",
                 "fatherId": "0020",
-                "name": "角色管理",
-                "path": "/auction/backstage/role-manage",
+                "name": "用户新增",
+                "path": "/auction/backstage/user-add",
                 "childItems": []
             },
             {
                 "id": "0023",
                 "fatherId": "0020",
-                "name": "页面管理",
-                "path": "/auction/backstage/page-manage",
+                "name": "角色管理",
+                "path": "/auction/backstage/role-manage",
                 "childItems": []
             },
             {
@@ -130,7 +144,7 @@ var menus = [
     }
 ];
 app.get('/menus', function (req, res) {
-    res.json({ menus: menus });
+    res.json({menus: menus});
 });
 // product
 var Product = (function () {
@@ -142,6 +156,7 @@ var Product = (function () {
         this.desc = desc;
         this.categories = categories;
     }
+
     return Product;
 }());
 exports.Product = Product;
@@ -155,11 +170,15 @@ var products = [
 ];
 app.get('/products', function (req, res) {
     res.status(200);
-    res.json({ products: products });
+    res.json({products: products});
 });
 app.get('/products/:id', function (req, res) {
     res.status(200);
-    res.json({ product: products.find(function (product) { return product.id == req.params.id; }) });
+    res.json({
+        product: products.find(function (product) {
+            return product.id == req.params.id;
+        })
+    });
 });
 app.get('/', function (req, res) {
     res.send("Hello Express");

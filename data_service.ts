@@ -102,15 +102,15 @@ const menus = [
             {
                 "id": "0022",
                 "fatherId": "0020",
-                "name": "角色管理",
-                "path": "/auction/backstage/role-manage",
+                "name": "用户新增",
+                "path": "/auction/backstage/user-add",
                 "childItems": []
             },
             {
                 "id": "0023",
                 "fatherId": "0020",
-                "name": "页面管理",
-                "path": "/auction/backstage/page-manage",
+                "name": "角色管理",
+                "path": "/auction/backstage/user-manage",
                 "childItems": []
             },
             {
