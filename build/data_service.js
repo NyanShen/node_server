@@ -1,7 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
+var _ = require("lodash");
 var app = express();
+app.all('*', function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By", ' 3.2.1');
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+});
+var server = app.listen(8088, "localhost", function () {
+    console.log("服务器已启动，地址是：http://localhost:8088");
+});
 // user
 var User = (function () {
     function User(id, userName, fullName, password, group, desc) {
@@ -19,9 +31,107 @@ var users = [
     new User('001', 'user_name_001', 'full_name_001', 'pass', '0', 'desc_001'),
     new User('002', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
     new User('003', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
-    new User('004', 'user_name_004', 'full_name_004', 'pass', '1', 'desc_004'),
-    new User('005', 'user_name_005', 'full_name_005', 'pass', '1', 'desc_005')
+    new User('004', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
+    new User('005', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
 ];
+app.get('/users', function (req, res) {
+    if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
+        res.json({ users: users });
+    }
+    else {
+        res.json({
+            users: users.filter(function (user) {
+                return ((user.userName).indexOf(req.query.userName)) > 0 ||
+                    ((user.fullName).indexOf(req.query.fullName)) > 0;
+            })
+        });
+    }
+});
+//menu
+var menus = [
+    {
+        "id": "0010",
+        "fatherId": "0000",
+        "name": "sell",
+        "path": "/auction/sell",
+        "childItems": [
+            {
+                "id": "0011",
+                "fatherId": "0010",
+                "name": "竞拍商品",
+                "path": "/auction/sell/product-list",
+                "childItems": []
+            },
+            {
+                "id": "0012",
+                "fatherId": "0010",
+                "name": "成交商品",
+                "path": "/auction/sell/product-success",
+                "childItems": []
+            },
+            {
+                "id": "0013",
+                "fatherId": "0010",
+                "name": "新增商品",
+                "path": "/auction/sell/product-add",
+                "childItems": []
+            },
+            {
+                "id": "0014",
+                "fatherId": "0010",
+                "name": "最新商品",
+                "path": "/auction/sell/product-latest",
+                "childItems": []
+            }
+        ]
+    },
+    {
+        "id": "0020",
+        "fatherId": "0000",
+        "name": "backstage",
+        "path": "/auction/backstage",
+        "childItems": [
+            {
+                "id": "0021",
+                "fatherId": "0020",
+                "name": "用户管理",
+                "path": "/auction/backstage/user-manage",
+                "childItems": []
+            },
+            {
+                "id": "0022",
+                "fatherId": "0020",
+                "name": "角色管理",
+                "path": "/auction/backstage/role-manage",
+                "childItems": []
+            },
+            {
+                "id": "0023",
+                "fatherId": "0020",
+                "name": "页面管理",
+                "path": "/auction/backstage/page-manage",
+                "childItems": []
+            },
+            {
+                "id": "0024",
+                "fatherId": "0010",
+                "name": "用户角色",
+                "path": "/auction/backstage/user-role",
+                "childItems": []
+            },
+            {
+                "id": "0025",
+                "fatherId": "0010",
+                "name": "模块管理",
+                "path": "/auction/backstage/module-manage",
+                "childItems": []
+            }
+        ]
+    }
+];
+app.get('/menus', function (req, res) {
+    res.json({ menus: menus });
+});
 // product
 var Product = (function () {
     function Product(id, title, price, rating, desc, categories) {
@@ -35,9 +145,6 @@ var Product = (function () {
     return Product;
 }());
 exports.Product = Product;
-app.get('/users', function (req, res) {
-    res.json(users);
-});
 var products = [
     new Product(1, '第一个商品', 1.99, 3.5, '这是第一个商品', ['电子产品']),
     new Product(2, '第二个商品', 2.99, 2.5, '这是第二个商品', ['电子产品', '硬件设备']),
@@ -46,15 +153,14 @@ var products = [
     new Product(5, '第五个商品', 5.99, 3.5, '这是第五个商品', ['电子产品']),
     new Product(6, '第五个商品', 6.99, 2.5, '这是第六个商', ['电子产品'])
 ];
-app.get('/', function (req, res) {
-    res.send("Hello Express");
-});
 app.get('/products', function (req, res) {
-    res.json(products);
+    res.status(200);
+    res.json({ products: products });
 });
 app.get('/products/:id', function (req, res) {
-    res.json(products.find(function (product) { return product.id == req.params.id; }));
+    res.status(200);
+    res.json({ product: products.find(function (product) { return product.id == req.params.id; }) });
 });
-var server = app.listen(8080, "localhost", function () {
-    console.log("服务器已启动，地址是：http://localhost:8080");
+app.get('/', function (req, res) {
+    res.send("Hello Express");
 });
