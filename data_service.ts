@@ -3,6 +3,14 @@ import * as _ from 'lodash';
 
 const app = express();
 
+var bodyParser = require('body-parser');
+// url 统一资源调配符 encoded 编码
+// app.use(bodyParser.urlencoded({extended: false}));
+// app.use(bodyParser.json());
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({extended: false});
+
+
 app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -34,18 +42,49 @@ const users: User[] = [
     new User('005', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
 ];
 
-app.get('/users', (req, res) => {
-    if (_.isEmpty(req.query.userName)&&_.isEmpty(req.query.fullName)) {
+app.get('/users/:id', function (req, res) {
+    res.status(200);
+    res.json(users.find(function (user) {
+        return user.id === req.params.id;
+    }));
+});
+app.get('/users', function (req, res) {
+    if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
         res.json({users: users});
-    } else {
+    }
+    else {
         res.json({
-            users: users.filter(
-                (user) =>
-                ((user.userName).indexOf(req.query.userName)) > 0 ||
-                ((user.fullName).indexOf(req.query.fullName)) > 0
-            )
+            users: users.filter(function (user) {
+                return ((user.userName).indexOf(req.query.userName)) > 0 ||
+                    ((user.fullName).indexOf(req.query.fullName)) > 0;
+            })
         });
     }
+});
+
+app.post('/users', jsonParser, urlencodedParser, function (req, res) {
+    var user = req.body.user;
+    users.push(user);
+    res.send('save success');
+});
+app.delete('/users/:id', function (req, res) {
+    const deleteUser = users.findIndex(function (user) {
+        return user.id === req.params.id;
+    });
+    users.splice(deleteUser, 1);
+    res.send('delete success');
+});
+app.patch('/users/:id', jsonParser, urlencodedParser, function (req, res) {
+    var user = req.body.user;
+    users.forEach(function (item) {
+        if (item.id === req.params.id) {
+            item.fullName = user.fullName;
+            item.password = user.password;
+            item.group = user.group;
+            item.desc = user.desc;
+        }
+    });
+    res.send('modify success');
 });
 
 //menu
