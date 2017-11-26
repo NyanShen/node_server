@@ -44,7 +44,9 @@ var users = [
 ];
 app.get('/users/:id', function (req, res) {
     res.status(200);
-    res.json(users.find(function (user) {return user.id === req.params.id;}));
+    res.json(users.find(function (user) {
+        return user.id === req.params.id;
+    }));
 });
 app.get('/users', function (req, res) {
     if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
@@ -70,6 +72,18 @@ app.delete('/users/:id', function (req, res) {
     });
     users.splice(deleteUser, 1);
     res.send('delete success');
+});
+app.patch('/users/:id', jsonParser, urlencodedParser, function (req, res) {
+    var user = req.body.user;
+    users.forEach(function (item) {
+        if (item.id === req.params.id) {
+            item.fullName = user.fullName;
+            item.password = user.password;
+            item.group = user.group;
+            item.desc = user.desc;
+        }
+    });
+    res.send('modify success');
 });
 
 //menu
