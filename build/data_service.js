@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", {value: true});
+Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var _ = require("lodash");
 var app = express();
@@ -8,8 +8,7 @@ var bodyParser = require('body-parser');
 // app.use(bodyParser.urlencoded({extended: false}));
 // app.use(bodyParser.json());
 var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({extended: false});
-
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -23,24 +22,24 @@ var server = app.listen(8088, "localhost", function () {
 });
 // user
 var User = (function () {
-    function User(id, userName, fullName, password, group, desc) {
+    function User(id, tokenId, userName, fullName, password, group, desc) {
         this.id = id;
+        this.tokenId = tokenId;
         this.userName = userName;
         this.fullName = fullName;
         this.password = password;
         this.group = group;
         this.desc = desc;
     }
-
     return User;
 }());
 exports.User = User;
 var users = [
-    new User('001', 'user_name_001', 'full_name_001', 'pass', '0', 'desc_001'),
-    new User('002', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
-    new User('003', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
-    new User('004', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
-    new User('005', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
+    new User('001', 'user_token_01', 'admin', 'full_name_001', 'pass', '0', 'desc_001'),
+    new User('002', 'user_token_02', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
+    new User('003', 'user_token_03', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
+    new User('004', 'user_token_04', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
+    new User('005', 'user_token_05', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
 ];
 app.get('/users/:id', function (req, res) {
     res.status(200);
@@ -50,7 +49,15 @@ app.get('/users/:id', function (req, res) {
 });
 app.get('/users', function (req, res) {
     if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
-        res.json({users: users});
+        res.json({ users: users });
+    }
+    else if (!_.isEmpty(req.query.password)) {
+        res.json({
+            user: users.filter(function (user) {
+                return (user.userName == req.query.userName) &&
+                    (user.password == req.query.password);
+            })
+        });
     }
     else {
         res.json({
@@ -67,7 +74,7 @@ app.post('/users', jsonParser, urlencodedParser, function (req, res) {
     res.send('save success');
 });
 app.delete('/users/:id', function (req, res) {
-    const deleteUser = users.findIndex(function (user) {
+    var deleteUser = users.findIndex(function (user) {
         return user.id === req.params.id;
     });
     users.splice(deleteUser, 1);
@@ -85,7 +92,6 @@ app.patch('/users/:id', jsonParser, urlencodedParser, function (req, res) {
     });
     res.send('modify success');
 });
-
 //menu
 var menus = [
     {
@@ -148,7 +154,7 @@ var menus = [
                 "id": "0023",
                 "fatherId": "0020",
                 "name": "角色管理",
-                "path": "/auction/backstage/role-manage",
+                "path": "/auction/backstage/user-manage",
                 "childItems": []
             },
             {
@@ -169,7 +175,7 @@ var menus = [
     }
 ];
 app.get('/menus', function (req, res) {
-    res.json({menus: menus});
+    res.json({ menus: menus });
 });
 // product
 var Product = (function () {
@@ -181,7 +187,6 @@ var Product = (function () {
         this.desc = desc;
         this.categories = categories;
     }
-
     return Product;
 }());
 exports.Product = Product;
@@ -195,15 +200,11 @@ var products = [
 ];
 app.get('/products', function (req, res) {
     res.status(200);
-    res.json({products: products});
+    res.json({ products: products });
 });
 app.get('/products/:id', function (req, res) {
     res.status(200);
-    res.json({
-        product: products.find(function (product) {
-            return product.id === req.params.id;
-        })
-    });
+    res.json({ product: products.find(function (product) { return product.id == req.params.id; }) });
 });
 app.get('/', function (req, res) {
     res.send("Hello Express");

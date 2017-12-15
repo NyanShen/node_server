@@ -3,12 +3,12 @@ import * as _ from 'lodash';
 
 const app = express();
 
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 // url 统一资源调配符 encoded 编码
 // app.use(bodyParser.urlencoded({extended: false}));
 // app.use(bodyParser.json());
-var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({extended: false});
+const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 
 app.all('*', function (req, res, next) {
@@ -27,6 +27,7 @@ const server = app.listen(8088, "localhost", () => {
 // user
 export class User {
     constructor(public id: string,
+                public tokenId: string,
                 public userName: string,
                 public fullName: string,
                 public password: string,
@@ -35,11 +36,11 @@ export class User {
     }
 }
 const users: User[] = [
-    new User('001', 'user_name_001', 'full_name_001', 'pass', '0', 'desc_001'),
-    new User('002', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
-    new User('003', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
-    new User('004', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
-    new User('005', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
+    new User('001', 'user_token_01', 'admin', 'full_name_001', 'pass', '0', 'desc_001'),
+    new User('002', 'user_token_02', 'user_name_002', 'full_name_002', 'pass', '0', 'desc_002'),
+    new User('003', 'user_token_03', 'user_name_003', 'full_name_003', 'pass', '0', 'desc_003'),
+    new User('004', 'user_token_04', 'user_name_010', 'full_name_010', 'pass', '1', 'desc_010'),
+    new User('005', 'user_token_05', 'user_name_011', 'full_name_011', 'pass', '1', 'desc_011')
 ];
 
 app.get('/users/:id', function (req, res) {
@@ -51,6 +52,13 @@ app.get('/users/:id', function (req, res) {
 app.get('/users', function (req, res) {
     if (_.isEmpty(req.query.userName) && _.isEmpty(req.query.fullName)) {
         res.json({users: users});
+    } else if (!_.isEmpty(req.query.password)) {
+        res.json({
+            user: users.filter(function (user) {
+                return (user.userName == req.query.userName) &&
+                    (user.password == req.query.password);
+            })
+        });
     }
     else {
         res.json({
@@ -63,7 +71,7 @@ app.get('/users', function (req, res) {
 });
 
 app.post('/users', jsonParser, urlencodedParser, function (req, res) {
-    var user = req.body.user;
+    const user = req.body.user;
     users.push(user);
     res.send('save success');
 });
@@ -75,7 +83,7 @@ app.delete('/users/:id', function (req, res) {
     res.send('delete success');
 });
 app.patch('/users/:id', jsonParser, urlencodedParser, function (req, res) {
-    var user = req.body.user;
+    const user = req.body.user;
     users.forEach(function (item) {
         if (item.id === req.params.id) {
             item.fullName = user.fullName;
